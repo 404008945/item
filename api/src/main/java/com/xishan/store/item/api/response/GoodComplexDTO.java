@@ -6,7 +6,7 @@ import lombok.Data;
  * good复杂对象响应
  */
 @Data
-public class GoodComplexResponse {
+public class GoodComplexDTO {
 
     private Integer id;
 
@@ -38,6 +38,6 @@ public class GoodComplexResponse {
      */
     private String brandName;
 
-    private String desc;
+    private String brandDesc;
 
 }

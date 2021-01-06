@@ -2,7 +2,11 @@ package com.xishan.store.item.server.mapper;
 
 
 import com.xishan.store.item.api.model.Goods;
+import com.xishan.store.item.api.request.FindByGoodRequest;
+import com.xishan.store.item.server.categories.GoodCategories;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 @Mapper
 public interface GoodsMapper {
@@ -19,4 +23,9 @@ public interface GoodsMapper {
     int updateByPrimaryKeyWithBLOBs(Goods record);
 
     int updateByPrimaryKey(Goods record);
+
+    /**
+     * 分页查询id，避免深分页，为全量dump做准备
+     */
+    List<Integer> pagingIds();
 }

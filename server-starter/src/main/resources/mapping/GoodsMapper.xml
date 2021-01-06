@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xishan.store.item.server.mapper.GoodsMapper">
+  <resultMap id="BaseResultMap" type="com.xishan.store.item.api.model.Goods">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="goods_name" jdbcType="VARCHAR" property="goodsName" />
+    <result column="brand_id" jdbcType="INTEGER" property="brandId" />
+    <result column="cate_id" jdbcType="INTEGER" property="cateId" />
+    <result column="price" jdbcType="BIGINT" property="price" />
+    <result column="original" jdbcType="BIGINT" property="original" />
+    <result column="tags" jdbcType="VARCHAR" property="tags" />
+    <result column="is_sale" jdbcType="TINYINT" property="isSale" />
+    <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+    <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, goods_name, brand_id, cate_id, price, original, tags, is_sale, created_at, updated_at
+  </sql>
+  <sql id="Blob_Column_List">
+    content, summary
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from goods
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="pagingIds"  resultType="java.lang.Integer">
+     select id from  goods
+  </select>
+
+  <select id="paging"   parameterType="com.xishan.store.item.api.request.FindByGoodRequest" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from goods
+    where  1=1 and
+    <if test="id != null">
+    id = #{id},
+  </if>
+    <if test="goodsName != null">
+      goods_name = #{goodsName} and,
+    </if>
+    <if test="brandId != null">
+      brand_id = #{brandId} and,
+    </if>
+    <if test="cateId != null">
+      cate_id = #{cateId} and,
+    </if>
+    <if test="price != null">
+      price = #{price} and,
+    </if>
+    <if test="original != null">
+      original = #{original} and,
+    </if>
+    <if test="tags != null">
+      tags like "%"#{tags}"%" and,
+    </if>
+    <if test="isSale != null">
+      is_sale = #{isSale} and,
+    </if>
+
+    <if test="content != null">
+      content like "%"#{content}"%" and,
+    </if>
+    <if test="summary != null">
+      summary like "%"#{summary}"%" and,
+    </if>
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from goods
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.xishan.store.item.api.model.Goods">
+    insert into goods (id, goods_name, brand_id, 
+      cate_id, price, original, 
+      tags, is_sale, created_at, 
+      updated_at, content, summary
+      )
+    values (#{id,jdbcType=INTEGER}, #{goodsName,jdbcType=VARCHAR}, #{brandId,jdbcType=INTEGER}, 
+      #{cateId,jdbcType=INTEGER}, #{price,jdbcType=BIGINT}, #{original,jdbcType=BIGINT}, 
+      #{tags,jdbcType=VARCHAR}, #{isSale,jdbcType=TINYINT}, #{createdAt,jdbcType=TIMESTAMP}, 
+      #{updatedAt,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR}, #{summary,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.xishan.store.item.api.model.Goods">
+    insert into goods
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="goodsName != null">
+        goods_name,
+      </if>
+      <if test="brandId != null">
+        brand_id,
+      </if>
+      <if test="cateId != null">
+        cate_id,
+      </if>
+      <if test="price != null">
+        price,
+      </if>
+      <if test="original != null">
+        original,
+      </if>
+      <if test="tags != null">
+        tags,
+      </if>
+      <if test="isSale != null">
+        is_sale,
+      </if>
+      <if test="createdAt != null">
+        created_at,
+      </if>
+      <if test="updatedAt != null">
+        updated_at,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+      <if test="summary != null">
+        summary,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="goodsName != null">
+        #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="brandId != null">
+        #{brandId,jdbcType=INTEGER},
+      </if>
+      <if test="cateId != null">
+        #{cateId,jdbcType=INTEGER},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=BIGINT},
+      </if>
+      <if test="original != null">
+        #{original,jdbcType=BIGINT},
+      </if>
+      <if test="tags != null">
+        #{tags,jdbcType=VARCHAR},
+      </if>
+      <if test="isSale != null">
+        #{isSale,jdbcType=TINYINT},
+      </if>
+      <if test="createdAt != null">
+        #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="summary != null">
+        #{summary,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xishan.store.item.api.model.Goods">
+    update goods
+    <set>
+      <if test="goodsName != null">
+        goods_name = #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="brandId != null">
+        brand_id = #{brandId,jdbcType=INTEGER},
+      </if>
+      <if test="cateId != null">
+        cate_id = #{cateId,jdbcType=INTEGER},
+      </if>
+      <if test="price != null">
+        price = #{price,jdbcType=BIGINT},
+      </if>
+      <if test="original != null">
+        original = #{original,jdbcType=BIGINT},
+      </if>
+      <if test="tags != null">
+        tags = #{tags,jdbcType=VARCHAR},
+      </if>
+      <if test="isSale != null">
+        is_sale = #{isSale,jdbcType=TINYINT},
+      </if>
+      <if test="createdAt != null">
+        created_at = #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="summary != null">
+        summary = #{summary,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.xishan.store.item.api.model.Goods">
+    update goods
+    set goods_name = #{goodsName,jdbcType=VARCHAR},
+      brand_id = #{brandId,jdbcType=INTEGER},
+      cate_id = #{cateId,jdbcType=INTEGER},
+      price = #{price,jdbcType=BIGINT},
+      original = #{original,jdbcType=BIGINT},
+      tags = #{tags,jdbcType=VARCHAR},
+      is_sale = #{isSale,jdbcType=TINYINT},
+      created_at = #{createdAt,jdbcType=TIMESTAMP},
+      updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      content = #{content,jdbcType=LONGVARCHAR},
+      summary = #{summary,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xishan.store.item.api.model.Goods">
+    update goods
+    set goods_name = #{goodsName,jdbcType=VARCHAR},
+      brand_id = #{brandId,jdbcType=INTEGER},
+      cate_id = #{cateId,jdbcType=INTEGER},
+      price = #{price,jdbcType=BIGINT},
+      original = #{original,jdbcType=BIGINT},
+      tags = #{tags,jdbcType=VARCHAR},
+      is_sale = #{isSale,jdbcType=TINYINT},
+      created_at = #{createdAt,jdbcType=TIMESTAMP},
+      updated_at = #{updatedAt,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
