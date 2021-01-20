@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * 创建索引并dump全量数据。，dump需要分页dump吗？
+ * 创建索引并dump全量数据。
  */
 @Component
 @Slf4j
@@ -107,7 +107,7 @@ public class EsInit  implements InitializingBean {
      * 全量dump索引,通过分页，一次分页100,直到全部分页完成
      */
     public void dumpGoodsIndex() {
-        int pageNo = 1;
+        int pageNo = 0;
         PageInfo<Integer> pageInfo = goodsService.pagingIds(pageNo, 100);
         List<Integer> ids = pageInfo.getList();
         queryAndIndex(ids);

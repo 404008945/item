@@ -6,8 +6,10 @@ import com.xishan.store.base.exception.ServiceException;
 import com.xishan.store.item.api.model.Brand;
 import com.xishan.store.item.api.model.Categories;
 import com.xishan.store.item.api.model.Goods;
+import com.xishan.store.item.api.request.DeleteGoodByIdRequest;
 import com.xishan.store.item.api.request.FindByGoodRequest;
 import com.xishan.store.item.api.response.GoodComplexDTO;
+import com.xishan.store.item.server.es.client.GoodEsClient;
 import com.xishan.store.item.server.mapper.BrandMapper;
 import com.xishan.store.item.server.mapper.CategoriesMapper;
 import com.xishan.store.item.server.mapper.GoodsMapper;
@@ -19,7 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * service查询出来的需要是复杂组合对象
+ * 增删改需要同步到es
  */
 @Service
 @Slf4j
@@ -34,6 +36,9 @@ public class GoodsService {
     @Autowired
     private CategoriesMapper categoriesMapper;
 
+    @Autowired
+    private GoodEsClient goodEsClient;
+
     /**
      * 查询good并关联类目和品牌
      * @param findByGoodRequest
@@ -43,6 +48,13 @@ public class GoodsService {
         if (findByGoodRequest == null) {
             throw new ServiceException("findByGoodRequest不可为没空");
         }
+        GoodComplexDTO complexDTO = new GoodComplexDTO();
+        complexDTO.setId(findByGoodRequest.getId());
+        complexDTO = goodEsClient.getById(complexDTO);
+        if(complexDTO != null){
+            return complexDTO;
+        }
+        //先从es中查 因为es是查询好的组装对象
         Integer goodId = findByGoodRequest.getId();
         Goods good = goodsMapper.selectByPrimaryKey(goodId);
         if(good == null){
@@ -56,14 +68,20 @@ public class GoodsService {
 
     private GoodComplexDTO toGoodComplex(Goods good,Brand brand,Categories categories){
         GoodComplexDTO goodComplexDTO = new GoodComplexDTO();
-        BeanUtils.copyProperties(good,goodComplexDTO);
+        if(good != null) {
+            BeanUtils.copyProperties(good, goodComplexDTO);
+        }
 
-        goodComplexDTO.setPid(categories.getPid());
-        goodComplexDTO.setCateName(categories.getCateName());
+        if(categories != null) {
+            goodComplexDTO.setPid(categories.getPid());
+            goodComplexDTO.setCateName(categories.getCateName());
+        }
 
-        goodComplexDTO.setBrandDesc(brand.getDesc());
+        if(brand != null) {
+            goodComplexDTO.setBrandDesc(brand.getDesc());
 
-        goodComplexDTO.setBrandName(brand.getBrandName());
+            goodComplexDTO.setBrandName(brand.getBrandName());
+        }
 
         return goodComplexDTO;
     }
@@ -74,6 +92,48 @@ public class GoodsService {
         PageInfo<Integer> pageInfo = new PageInfo(ids);
         return pageInfo;
     }
+
+    public int insert(Goods goods){
+        if(goods == null){
+            throw new ServiceException("goods不可为没空");
+        }
+       int id = goodsMapper.insert(goods);
+        if(id > 0){
+            FindByGoodRequest findByGoodRequest = new FindByGoodRequest();
+            findByGoodRequest.setId(goods.getId());
+            goodEsClient.index(this.findByGoodId(findByGoodRequest));
+        }
+        return id;
+    }
+
+    public int update(Goods goods){
+        if(goods == null){
+            throw new ServiceException("goods不可为空");
+        }
+        int n = goodsMapper.updateByPrimaryKeySelective(goods);
+        if (n >= 0) {
+            goodEsClient.index(this.toGoodComplex(goods,null,null));
+        }
+        return n;
+    }
+
+    public int delete(DeleteGoodByIdRequest deleteGoodByIdRequest){
+        if(deleteGoodByIdRequest == null){
+            throw new ServiceException("deleteGoodByIdRequest 不可为空");
+        }
+        int n = goodsMapper.deleteByPrimaryKey(deleteGoodByIdRequest.getId());
+        if (n >= 0) {
+            GoodComplexDTO goodComplexDTO = new GoodComplexDTO();
+            goodComplexDTO.setId(deleteGoodByIdRequest.getId());
+            goodEsClient.deleteById(goodComplexDTO);
+        }
+        return n;
+    }
+
+
+
+
+
 
 
 }

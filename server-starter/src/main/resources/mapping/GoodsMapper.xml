@@ -16,14 +16,10 @@
   <sql id="Base_Column_List">
     id, goods_name, brand_id, cate_id, price, original, tags, is_sale, created_at, updated_at
   </sql>
-  <sql id="Blob_Column_List">
-    content, summary
-  </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
+
     from goods
     where id = #{id,jdbcType=INTEGER}
   </select>
@@ -62,27 +58,22 @@
       is_sale = #{isSale} and,
     </if>
 
-    <if test="content != null">
-      content like "%"#{content}"%" and,
-    </if>
-    <if test="summary != null">
-      summary like "%"#{summary}"%" and,
-    </if>
+
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from goods
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.xishan.store.item.api.model.Goods">
-    insert into goods (id, goods_name, brand_id, 
+  <insert id="insert" parameterType="com.xishan.store.item.api.model.Goods" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    insert into goods ( goods_name, brand_id,
       cate_id, price, original, 
       tags, is_sale, created_at, 
-      updated_at, content, summary
+      updated_at
       )
-    values (#{id,jdbcType=INTEGER}, #{goodsName,jdbcType=VARCHAR}, #{brandId,jdbcType=INTEGER}, 
-      #{cateId,jdbcType=INTEGER}, #{price,jdbcType=BIGINT}, #{original,jdbcType=BIGINT}, 
-      #{tags,jdbcType=VARCHAR}, #{isSale,jdbcType=TINYINT}, #{createdAt,jdbcType=TIMESTAMP}, 
-      #{updatedAt,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR}, #{summary,jdbcType=LONGVARCHAR}
+    values ( #{goodsName,jdbcType=VARCHAR}, #{brandId,jdbcType=INTEGER},
+      #{cateId,jdbcType=INTEGER}, #{price,jdbcType=BIGINT}, #{original,jdbcType=BIGINT},
+      #{tags,jdbcType=VARCHAR},#{isSale,jdbcType=TINYINT},#{createdAt,jdbcType=TIMESTAMP},
+      #{updatedAt,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.xishan.store.item.api.model.Goods">
@@ -118,12 +109,6 @@
       <if test="updatedAt != null">
         updated_at,
       </if>
-      <if test="content != null">
-        content,
-      </if>
-      <if test="summary != null">
-        summary,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -155,12 +140,6 @@
       </if>
       <if test="updatedAt != null">
         #{updatedAt,jdbcType=TIMESTAMP},
-      </if>
-      <if test="content != null">
-        #{content,jdbcType=LONGVARCHAR},
-      </if>
-      <if test="summary != null">
-        #{summary,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>
@@ -194,12 +173,6 @@
       <if test="updatedAt != null">
         updated_at = #{updatedAt,jdbcType=TIMESTAMP},
       </if>
-      <if test="content != null">
-        content = #{content,jdbcType=LONGVARCHAR},
-      </if>
-      <if test="summary != null">
-        summary = #{summary,jdbcType=LONGVARCHAR},
-      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -213,9 +186,7 @@
       tags = #{tags,jdbcType=VARCHAR},
       is_sale = #{isSale,jdbcType=TINYINT},
       created_at = #{createdAt,jdbcType=TIMESTAMP},
-      updated_at = #{updatedAt,jdbcType=TIMESTAMP},
-      content = #{content,jdbcType=LONGVARCHAR},
-      summary = #{summary,jdbcType=LONGVARCHAR}
+      updated_at = #{updatedAt,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.xishan.store.item.api.model.Goods">
