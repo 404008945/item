@@ -1,39 +1,35 @@
 package com.xishan.store.item.server.es;
 
-import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
+import com.xishan.store.escommon.EsUtil;
+import com.xishan.store.escommon.model.Bulk;
 import com.xishan.store.item.api.request.FindByGoodRequest;
 import com.xishan.store.item.api.response.GoodComplexDTO;
+
 import com.xishan.store.item.server.service.GoodsService;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.GetIndexRequest;
-import org.elasticsearch.common.xcontent.XContentType;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 创建索引并dump全量数据。，dump需要分页dump吗？
  */
 @Component
 @Slf4j
-public class EsInit {
+public class EsInit  implements InitializingBean {
     @Autowired
     private RestHighLevelClient client;
+
+    private EsUtil esUtil;
 
     @Value("${goodIndex:goods_index}")
     private String goodIndex;
@@ -43,7 +39,9 @@ public class EsInit {
 
     @PostConstruct
     public void init(){
-       if(!indexExists(goodIndex)){
+        this.esUtil = new EsUtil();
+        this.esUtil.setClient(client);
+       if(!esUtil.indexExists(goodIndex)){
            //创建索引
            createGoodsIndex();
            //全量dump数据
@@ -52,15 +50,6 @@ public class EsInit {
        }
     }
 
-    public boolean indexExists(String indexName) {
-        try {
-             GetIndexRequest getIndexRequest = new GetIndexRequest(goodIndex);
-             return  client.indices().exists(getIndexRequest,RequestOptions.DEFAULT);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
 
     public void createGoodsIndex() {
         try {
@@ -115,7 +104,7 @@ public class EsInit {
     }
 
     /**
-     * 全量dump索引,通过分页，一次分页1000,直到全部分页完成
+     * 全量dump索引,通过分页，一次分页100,直到全部分页完成
      */
     public void dumpGoodsIndex() {
         int pageNo = 1;
@@ -133,6 +122,7 @@ public class EsInit {
 
     public void queryAndIndex(List<Integer> ids){
         List<GoodComplexDTO> goods = new ArrayList<>();
+        List<Bulk> bulks = new ArrayList<>();
         ids.stream().forEach(it->{
             FindByGoodRequest findByGoodRequest = new FindByGoodRequest();
             findByGoodRequest.setId(it);
@@ -140,33 +130,19 @@ public class EsInit {
             if(goodComplexDTO != null){
                 log.info("dump good:{}",goodComplexDTO);
                 goods.add(goodComplexDTO);
+                Bulk bulk = new Bulk(String.valueOf(goodComplexDTO.getId()),goodComplexDTO);
+
+                bulks.add(bulk);
             }
         });
-        bulkIndex(goodIndex,goods);
+
+
+        esUtil.bulkIndex(goodIndex,bulks);
     }
 
-    /**
-     * 批量插入数据
-     * @param indexName
-     * @param bulks
-     * @return
-     */
-    public BulkResponse bulkIndex(String indexName, List<GoodComplexDTO> bulks) {
-        try{
-            BulkRequest bulkRequest = new BulkRequest();
-            IndexRequest request = null;
-            for(GoodComplexDTO bulk: bulks) {
-                request = new IndexRequest("post");
-                request.index(indexName).id(String.valueOf(bulk.getId())).source(JSON.toJSONString(bulk), XContentType.JSON);
-                bulkRequest.add(request);
-            }
-            BulkResponse response = client.bulk(bulkRequest, RequestOptions.DEFAULT);
-            return response;
-        }catch (Exception e){
-            e.printStackTrace();
-            log.info("dump es失败");
-        }
-        return null;
-    }
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+
+    }
 }

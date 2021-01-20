@@ -73,6 +73,14 @@
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.xishan.store</groupId>
+            <artifactId>es-common</artifactId>
+        </dependency>
     </dependencies>
 
 
