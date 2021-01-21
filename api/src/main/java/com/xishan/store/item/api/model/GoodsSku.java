@@ -19,7 +19,7 @@ public class GoodsSku {
 
     private String goodsCode;
 
-    private Byte status;
+    private Byte status;//0 有货 1 无货
 
     private Date createdAt;
 

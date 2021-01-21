@@ -24,6 +24,13 @@
     from goods_sku
     where id = #{id,jdbcType=INTEGER}
   </select>
+
+  <select id="selectByGoodsId"  parameterType="com.xishan.store.item.api.model.GoodsSku" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from goods_sku
+    where goods_id = #{goodsId,jdbcType=INTEGER}
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from goods_sku
     where id = #{id,jdbcType=INTEGER}

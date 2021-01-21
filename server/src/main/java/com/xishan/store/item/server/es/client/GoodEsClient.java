@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -78,21 +79,62 @@ public class GoodEsClient  implements InitializingBean {
         return boolQuery;
     }
 
+    /**
+     * term单条件
+     * @param fieldKey
+     * @param value
+     * @return
+     */
+    public BoolQueryBuilder onTermWithSingle(String fieldKey,  Integer value){
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.should(QueryBuilders.termQuery(fieldKey, value));
+        return boolQuery;
+    }
+
     public EsPage<GoodComplexDTO> paging(GoodComplexDTO goodComplexDTO,int pageNo ,int pageSize){
         if(goodComplexDTO == null){
             throw  new ServiceException("goodComplexDTO不可为空");
         }
         BoolQueryBuilder mustQuery = QueryBuilders.boolQuery();
+        makeCretiria(mustQuery,goodComplexDTO);
+        return esUtil.paging(goodIndex,mustQuery,pageNo,pageSize,GoodComplexDTO.class);
+    }
+    public List<GoodComplexDTO> listAll(GoodComplexDTO goodComplexDTO){
+        if(goodComplexDTO == null){
+            throw  new ServiceException("goodComplexDTO不可为空");
+        }
+        BoolQueryBuilder mustQuery = QueryBuilders.boolQuery();
+        makeCretiria(mustQuery,goodComplexDTO);
+        return esUtil.listAll(goodIndex,mustQuery,GoodComplexDTO.class);
+    }
+
+    private void makeCretiria(BoolQueryBuilder boolQueryBuilder,GoodComplexDTO goodComplexDTO){
 
         if(goodComplexDTO.getGoodsName()!=null) {
-            mustQuery.must(orMatchUnionWithList("goodsName", Lists.newArrayList(goodComplexDTO.getGoodsName())));
+            boolQueryBuilder.must(orMatchUnionWithList("goodsName", Lists.newArrayList(goodComplexDTO.getGoodsName())));
         }
         if(goodComplexDTO.getBrandName()!=null) {
-            mustQuery.must(orMatchUnionWithList("brandName", Lists.newArrayList(goodComplexDTO.getBrandName())));
+            boolQueryBuilder.must(orMatchUnionWithList("brandName", Lists.newArrayList(goodComplexDTO.getBrandName())));
         }
         if(goodComplexDTO.getCateName() != null) {
-            mustQuery.must(orMatchUnionWithList("cateName", Lists.newArrayList(goodComplexDTO.getCateName())));
+            boolQueryBuilder.must(orMatchUnionWithList("cateName", Lists.newArrayList(goodComplexDTO.getCateName())));
         }
-        return esUtil.paging(goodIndex,mustQuery,pageNo,pageSize,GoodComplexDTO.class);
+        if(goodComplexDTO.getBrandId() != null) {
+            boolQueryBuilder.must(onTermWithSingle("brandId",goodComplexDTO.getBrandId()));
+        }
+        if(goodComplexDTO.getBrandId() != null) {
+            boolQueryBuilder.must(onTermWithSingle("brandId",goodComplexDTO.getBrandId()));
+        }
+        if(goodComplexDTO.getCateId() != null) {
+            boolQueryBuilder.must(onTermWithSingle("cateId",goodComplexDTO.getCateId()));
+        }
+    }
+
+    public void batchUpdate(List<GoodComplexDTO> goodComplexDTOS){
+        List<Bulk> bulks = new ArrayList<>();
+        goodComplexDTOS.forEach(it->{
+            bulks.add(new Bulk(String.valueOf(it.getId()),it));
+        });
+        esUtil.bulkIndex(goodIndex,bulks);
     }
 }

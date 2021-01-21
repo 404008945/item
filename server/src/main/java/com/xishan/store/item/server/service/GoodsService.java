@@ -6,16 +6,22 @@ import com.xishan.store.base.exception.ServiceException;
 import com.xishan.store.item.api.model.Brand;
 import com.xishan.store.item.api.model.Categories;
 import com.xishan.store.item.api.model.Goods;
+import com.xishan.store.item.api.model.GoodsSku;
 import com.xishan.store.item.api.request.DeleteGoodByIdRequest;
 import com.xishan.store.item.api.request.FindByGoodRequest;
 import com.xishan.store.item.api.response.GoodComplexDTO;
+import com.xishan.store.item.api.response.GoodDetailComplexDTO;
+import com.xishan.store.item.api.response.GoodsSkuDTO;
 import com.xishan.store.item.server.es.client.GoodEsClient;
 import com.xishan.store.item.server.mapper.BrandMapper;
 import com.xishan.store.item.server.mapper.CategoriesMapper;
 import com.xishan.store.item.server.mapper.GoodsMapper;
+import com.xishan.store.item.server.redis.RedisUtil;
+import com.xishan.store.item.server.util.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,7 +43,17 @@ public class GoodsService {
     private CategoriesMapper categoriesMapper;
 
     @Autowired
+    private GoodsSkuService goodsSkuService;
+
+    @Autowired
     private GoodEsClient goodEsClient;
+
+    @Autowired
+    private RedisUtil redisUtil;
+
+    //默认30秒到期
+    @Value("${expireTime:1000*60*30}")
+    private Integer expireTime;
 
     /**
      * 查询good并关联类目和品牌
@@ -130,9 +146,29 @@ public class GoodsService {
         return n;
     }
 
-
-
-
+    /**
+     * 在redis，直接用，不在redis，重新取
+     * @param findByGoodRequest
+     * @return
+     */
+    public GoodDetailComplexDTO getGoodDetail(FindByGoodRequest  findByGoodRequest){
+        GoodDetailComplexDTO goodDetailComplexDTO = redisUtil.get(redisUtil.makeGoodRedisKey(findByGoodRequest.getId()),GoodDetailComplexDTO.class);
+        if(goodDetailComplexDTO != null){
+            return goodDetailComplexDTO;
+        }
+        GoodComplexDTO goodComplexDTO = this.findByGoodId(findByGoodRequest);
+        if(goodComplexDTO == null){
+            return null;
+        }
+        goodDetailComplexDTO = BeanUtil.convertToBean(goodComplexDTO,GoodDetailComplexDTO.class);
+        GoodsSku goodsSku = new GoodsSku();
+        goodsSku.setGoodsId(findByGoodRequest.getId());
+        List<GoodsSkuDTO> goodsSkuDTOS = goodsSkuService.listByGoodsId(goodsSku);
+        goodDetailComplexDTO.setGoodsSkuList(goodsSkuDTOS);
+        //放进redis
+        redisUtil.set(redisUtil.makeGoodRedisKey(goodDetailComplexDTO.getId()),goodDetailComplexDTO,expireTime);
+        return goodDetailComplexDTO;
+    }
 
 
 
