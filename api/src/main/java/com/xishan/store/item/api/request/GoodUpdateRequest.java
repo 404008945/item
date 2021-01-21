@@ -1,13 +1,11 @@
 package com.xishan.store.item.api.request;
 
-import com.xishan.store.base.page.PageCommon;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 @Data
-public class FindByGoodRequest extends PageCommon {
+public class GoodUpdateRequest implements Serializable {
 
     private Integer id;
 
@@ -25,7 +23,4 @@ public class FindByGoodRequest extends PageCommon {
 
     private Byte isSale;
 
-    private Date createdAt;
-
-    private Date updatedAt;
 }

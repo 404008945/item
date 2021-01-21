@@ -2,8 +2,6 @@ package com.xishan.store.item.server.mapper;
 
 
 import com.xishan.store.item.api.model.Goods;
-import com.xishan.store.item.api.request.FindByGoodRequest;
-import com.xishan.store.item.server.categories.GoodCategories;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

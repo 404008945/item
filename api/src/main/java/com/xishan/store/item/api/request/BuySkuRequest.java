@@ -2,8 +2,10 @@ package com.xishan.store.item.api.request;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class BuySkuRequest {
+public class BuySkuRequest implements Serializable {
 
     private Integer goodId;
 

@@ -3,6 +3,8 @@ package com.xishan.store.item.server.service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.xishan.store.base.exception.ServiceException;
+import com.xishan.store.base.page.Paging;
+import com.xishan.store.escommon.page.EsPage;
 import com.xishan.store.item.api.model.Brand;
 import com.xishan.store.item.api.model.Categories;
 import com.xishan.store.item.api.model.Goods;
@@ -52,7 +54,7 @@ public class GoodsService {
     private RedisUtil redisUtil;
 
     //默认30秒到期
-    @Value("${expireTime:1000*60*30}")
+    @Value("${expireTime:30}")
     private Integer expireTime;
 
     /**
@@ -128,7 +130,9 @@ public class GoodsService {
         }
         int n = goodsMapper.updateByPrimaryKeySelective(goods);
         if (n >= 0) {
-            goodEsClient.index(this.toGoodComplex(goods,null,null));
+            GoodComplexDTO goodComplexDTO =this.toGoodComplex(goods,null,null);
+            goodEsClient.index(goodComplexDTO);
+            redisUtil.del(redisUtil.makeGoodRedisKey(goodComplexDTO.getId()));
         }
         return n;
     }
@@ -142,10 +146,10 @@ public class GoodsService {
             GoodComplexDTO goodComplexDTO = new GoodComplexDTO();
             goodComplexDTO.setId(deleteGoodByIdRequest.getId());
             goodEsClient.deleteById(goodComplexDTO);
+            redisUtil.del(redisUtil.makeGoodRedisKey(goodComplexDTO.getId()));
         }
         return n;
     }
-
     /**
      * 在redis，直接用，不在redis，重新取
      * @param findByGoodRequest
@@ -166,9 +170,24 @@ public class GoodsService {
         List<GoodsSkuDTO> goodsSkuDTOS = goodsSkuService.listByGoodsId(goodsSku);
         goodDetailComplexDTO.setGoodsSkuList(goodsSkuDTOS);
         //放进redis
-        redisUtil.set(redisUtil.makeGoodRedisKey(goodDetailComplexDTO.getId()),goodDetailComplexDTO,expireTime);
+        redisUtil.set(redisUtil.makeGoodRedisKey(goodDetailComplexDTO.getId()),goodDetailComplexDTO,expireTime*1000*60);
         return goodDetailComplexDTO;
     }
+
+
+    public Paging<GoodComplexDTO> paging(GoodComplexDTO complexDTO, int pageNo, int pageSize) {
+        EsPage<GoodComplexDTO> esPage = goodEsClient.paging(complexDTO, pageNo, pageSize);
+        if (esPage == null) {
+            throw new ServiceException("查询失败");
+        }
+        Paging<GoodComplexDTO> paging = new Paging<>();
+        paging.setData(esPage.getData());
+        paging.setPageNo(esPage.getPageNo());
+        paging.setPageSize(esPage.getPageSize());
+        return paging;
+    }
+
+
 
 
 

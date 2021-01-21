@@ -91,14 +91,6 @@ public class GoodEsClient  implements InitializingBean {
         return boolQuery;
     }
 
-    public EsPage<GoodComplexDTO> paging(GoodComplexDTO goodComplexDTO,int pageNo ,int pageSize){
-        if(goodComplexDTO == null){
-            throw  new ServiceException("goodComplexDTO不可为空");
-        }
-        BoolQueryBuilder mustQuery = QueryBuilders.boolQuery();
-        makeCretiria(mustQuery,goodComplexDTO);
-        return esUtil.paging(goodIndex,mustQuery,pageNo,pageSize,GoodComplexDTO.class);
-    }
     public List<GoodComplexDTO> listAll(GoodComplexDTO goodComplexDTO){
         if(goodComplexDTO == null){
             throw  new ServiceException("goodComplexDTO不可为空");
@@ -106,6 +98,14 @@ public class GoodEsClient  implements InitializingBean {
         BoolQueryBuilder mustQuery = QueryBuilders.boolQuery();
         makeCretiria(mustQuery,goodComplexDTO);
         return esUtil.listAll(goodIndex,mustQuery,GoodComplexDTO.class);
+    }
+    public EsPage<GoodComplexDTO> paging(GoodComplexDTO goodComplexDTO,int pageNo ,int pageSize){
+        if(goodComplexDTO == null){
+            throw  new ServiceException("goodComplexDTO不可为空");
+        }
+        BoolQueryBuilder mustQuery = QueryBuilders.boolQuery();
+        makeCretiria(mustQuery,goodComplexDTO);
+        return esUtil.paging(goodIndex,mustQuery,pageNo,pageSize,GoodComplexDTO.class);
     }
 
     private void makeCretiria(BoolQueryBuilder boolQueryBuilder,GoodComplexDTO goodComplexDTO){

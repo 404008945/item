@@ -3,6 +3,7 @@ package com.xishan.store.item.server.service;
 import com.xishan.store.base.exception.ServiceException;
 import com.xishan.store.base.util.Response;
 import com.xishan.store.item.api.model.Brand;
+import com.xishan.store.item.api.request.FindBrandRequest;
 import com.xishan.store.item.api.response.GoodComplexDTO;
 import com.xishan.store.item.server.es.client.GoodEsClient;
 import com.xishan.store.item.server.mapper.BrandMapper;
@@ -26,16 +27,16 @@ public class BrandService {
     private RedisUtil redisUtil;
 
 
-    public Brand findById(Brand brand){
+    public Brand findById(FindBrandRequest brand){
         return brandMapper.selectByPrimaryKey(brand.getId());
     }
 
-    public Response<Integer> insert(Brand brand){
+    public Integer insert(Brand brand){
         int n = brandMapper.insert(brand);
         if (n > 0) {
-            return Response.ok(n,Integer.class);
+            return n;
         }
-        return Response.fail("插入失败",Integer.class);
+        throw new ServiceException("插入失败");
     }
 
     public Integer update(Brand brand){
