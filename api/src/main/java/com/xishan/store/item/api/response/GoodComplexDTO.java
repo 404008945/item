@@ -1,12 +1,13 @@
 package com.xishan.store.item.api.response;
 
+import com.xishan.store.base.page.PageCommon;
 import lombok.Data;
 
 /**
  * good复杂对象响应
  */
 @Data
-public class GoodComplexDTO {
+public class GoodComplexDTO  extends PageCommon {
 
     private Integer id;
 

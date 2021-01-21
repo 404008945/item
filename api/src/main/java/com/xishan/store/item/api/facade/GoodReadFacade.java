@@ -9,7 +9,7 @@ import com.xishan.store.item.api.response.GoodDetailComplexDTO;
 public interface GoodReadFacade {
      Response<GoodComplexDTO> findByGoodId(FindByGoodRequest findByGoodRequest);
 
-     Response<Paging<GoodComplexDTO>> paging(GoodComplexDTO goodComplexDTO,FindByGoodRequest findByGoodRequest);
+     Response<Paging<GoodComplexDTO>> paging(GoodComplexDTO goodComplexDTO);
 
      Response<GoodDetailComplexDTO> getGoodDetail(FindByGoodRequest  findByGoodRequest);
 }

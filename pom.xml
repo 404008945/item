@@ -19,6 +19,8 @@
         <module>api</module>
         <module>server</module>
         <module>server-starter</module>
+        <module>web</module>
+        <module>web-starter</module>
     </modules>
 
     <properties>
@@ -64,7 +66,16 @@
                 <artifactId>lombok</artifactId>
                 <version>1.16.20</version>
             </dependency>
-
+          <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>2.9.2</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.zookeeper</groupId>

@@ -26,9 +26,9 @@ public class GoodReadFacadeImpl implements GoodReadFacade {
     }
 
     @Override
-    public Response<Paging<GoodComplexDTO>> paging(GoodComplexDTO goodComplexDTO, FindByGoodRequest findByGoodRequest) {
+    public Response<Paging<GoodComplexDTO>> paging(GoodComplexDTO goodComplexDTO) {
         try {
-            Paging<GoodComplexDTO> paging = goodsService.paging(goodComplexDTO,findByGoodRequest.getPageNo(),findByGoodRequest.getPageSize());
+            Paging<GoodComplexDTO> paging = goodsService.paging(goodComplexDTO,goodComplexDTO.getPageNo(),goodComplexDTO.getPageSize());
             return Response.ok(paging);
         }catch (Exception e){
             return Response.fail(e.getMessage());
