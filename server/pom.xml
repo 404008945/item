@@ -83,7 +83,10 @@
             <groupId>org.apache.dubbo</groupId>
             <artifactId>dubbo-spring-boot-starter</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -92,6 +95,11 @@
             <groupId>com.xishan.store</groupId>
             <artifactId>es-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.xishan.store.usercenter</groupId>
+            <artifactId>user-api</artifactId>
+        </dependency>
+
     </dependencies>
 
 

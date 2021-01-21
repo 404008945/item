@@ -126,6 +126,11 @@
                 <version>19.0</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.xishan.store.usercenter</groupId>
+                <artifactId>user-api</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
