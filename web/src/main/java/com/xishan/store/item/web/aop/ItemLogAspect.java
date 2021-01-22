@@ -24,7 +24,7 @@ public class ItemLogAspect {
 
     //申明一个切点 里面是 execution表达式
 
-    @Pointcut("execution(public * com.xishan.store.usercenter.userweb.controller.*.*(..))")
+    @Pointcut("execution(public * com.xishan.store.item.web.controller.*.*(..))")
     private void controllerAspect() {
     }
 

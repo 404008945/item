@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 @Order(3)
 public class ItemUserContextAop {
 
-    @Pointcut("execution(public * com.xishan.store.usercenter.userweb.controller.*.*(..))")
+    @Pointcut("execution(public * com.xishan.store.item.web.controller.*.*(..))")
     private void userContextAspect() {
     }
 
