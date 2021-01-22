@@ -184,6 +184,7 @@ public class GoodsService {
         paging.setData(esPage.getData());
         paging.setPageNo(esPage.getPageNo());
         paging.setPageSize(esPage.getPageSize());
+        paging.setTotal(Integer.valueOf(String.valueOf(esPage.getTotal())));
         return paging;
     }
 

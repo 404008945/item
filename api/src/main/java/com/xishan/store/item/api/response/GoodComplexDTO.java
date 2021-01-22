@@ -3,11 +3,13 @@ package com.xishan.store.item.api.response;
 import com.xishan.store.base.page.PageCommon;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * good复杂对象响应
  */
 @Data
-public class GoodComplexDTO  extends PageCommon {
+public class GoodComplexDTO implements Serializable {
 
     private Integer id;
 

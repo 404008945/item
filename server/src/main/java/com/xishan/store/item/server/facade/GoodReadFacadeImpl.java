@@ -4,9 +4,11 @@ import com.xishan.store.base.page.Paging;
 import com.xishan.store.base.util.Response;
 import com.xishan.store.item.api.facade.GoodReadFacade;
 import com.xishan.store.item.api.request.FindByGoodRequest;
+import com.xishan.store.item.api.request.GoodsPageingRequest;
 import com.xishan.store.item.api.response.GoodComplexDTO;
 import com.xishan.store.item.api.response.GoodDetailComplexDTO;
 import com.xishan.store.item.server.service.GoodsService;
+import com.xishan.store.item.server.util.BeanUtil;
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 @Service
@@ -26,9 +28,10 @@ public class GoodReadFacadeImpl implements GoodReadFacade {
     }
 
     @Override
-    public Response<Paging<GoodComplexDTO>> paging(GoodComplexDTO goodComplexDTO) {
+    public Response<Paging<GoodComplexDTO>> paging( GoodsPageingRequest goodsPageingRequest) {
         try {
-            Paging<GoodComplexDTO> paging = goodsService.paging(goodComplexDTO,goodComplexDTO.getPageNo(),goodComplexDTO.getPageSize());
+            GoodComplexDTO goodComplexDTO = BeanUtil.convertToBean(goodsPageingRequest,GoodComplexDTO.class);
+            Paging<GoodComplexDTO> paging = goodsService.paging(goodComplexDTO,goodsPageingRequest.getPageNo(),goodsPageingRequest.getPageSize());
             return Response.ok(paging);
         }catch (Exception e){
             return Response.fail(e.getMessage());

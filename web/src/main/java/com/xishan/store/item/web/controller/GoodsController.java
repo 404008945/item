@@ -10,6 +10,7 @@ import com.xishan.store.item.api.facade.GoodWriteFacade;
 import com.xishan.store.item.api.request.DeleteGoodByIdRequest;
 import com.xishan.store.item.api.request.FindByGoodRequest;
 import com.xishan.store.item.api.request.GoodUpdateRequest;
+import com.xishan.store.item.api.request.GoodsPageingRequest;
 import com.xishan.store.item.api.response.GoodComplexDTO;
 import com.xishan.store.item.api.response.GoodDetailComplexDTO;
 import io.swagger.annotations.Api;
@@ -46,8 +47,8 @@ public class GoodsController {
     @ResponseBody
     @ResponseJsonFormat
     @Authority
-    public Paging<GoodComplexDTO> paging(GoodComplexDTO goodComplexDTO){
-        Response<Paging<GoodComplexDTO>> response = goodReadFacade.paging(goodComplexDTO);
+    public Paging<GoodComplexDTO> paging(GoodsPageingRequest goodsPageingRequest){
+        Response<Paging<GoodComplexDTO>> response = goodReadFacade.paging(goodsPageingRequest);
         if(!response.isSuccess()){
             throw new RestException("查找失败"+response.getMessage());
         }
@@ -59,7 +60,7 @@ public class GoodsController {
     @Authority
     public GoodDetailComplexDTO getGoodDetail(FindByGoodRequest  findByGoodRequest){
         Response<GoodDetailComplexDTO> response = goodReadFacade.getGoodDetail(findByGoodRequest);
-        if(response.isSuccess()){
+        if(!response.isSuccess()){
             throw new RestException("查找失败"+response.getMessage());
         }
         return  response.getData();

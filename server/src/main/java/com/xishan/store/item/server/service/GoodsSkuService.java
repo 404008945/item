@@ -2,6 +2,7 @@ package com.xishan.store.item.server.service;
 
 import com.xishan.store.base.exception.ServiceException;
 import com.xishan.store.base.util.Response;
+import com.xishan.store.item.api.model.BuyRecord;
 import com.xishan.store.item.api.model.GoodsSku;
 import com.xishan.store.item.api.request.BuySkuRequest;
 import com.xishan.store.item.api.response.BuySkuResponse;
@@ -10,6 +11,7 @@ import com.xishan.store.item.server.mapper.GoodsSkuMapper;
 import com.xishan.store.item.server.redis.RedisLock;
 import com.xishan.store.item.server.redis.RedisUtil;
 import com.xishan.store.item.server.util.BeanUtil;
+import com.xishan.store.usercenter.userapi.context.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +39,10 @@ public class GoodsSkuService {
     //15秒未抢到，则失败，需要重新抢
     @Value("${lockExpireTime:15000}")
     private Integer lockExpireTime;
+
+    @Autowired
+    private BuyRecordService buyRecordService;
+
 
     public GoodsSku findById(GoodsSku goodsSku){
         return goodsSkuMapper.selectByPrimaryKey(goodsSku.getId());
@@ -77,16 +83,21 @@ public class GoodsSkuService {
         return BeanUtil.convertToBeanList(goodsSkus,GoodsSkuDTO.class);
     }
     /**
-     * 购买商品为什么要加锁
+     * 购买商品为什么要加锁,如何做幂等
      */
     public BuySkuResponse buyGoods(BuySkuRequest buySkuRequest){//锁的是sku，而不是good
         if (buySkuRequest == null) {
             throw new ServiceException("购买商品参数错误");
         }
         //value保证了，我这里加的锁只有本方法能解锁
-        String value = UUID.randomUUID().toString();
+        //做幂等，判断是否已经存在
+        String value = buySkuRequest.getUuid();
         try {
             if (redisLock.tryLock(redisUtil.makeSkuRedisKey(buySkuRequest.getSkuId()), value, lockExpireTime)) {
+                BuyRecord record = buyRecordService.findByBuyId(value);
+                if (record != null) {
+                    throw new ServiceException("不可重复购买");
+                }
                 //进行判断与扣除操作
                 GoodsSku req = new GoodsSku();
                 req.setId(buySkuRequest.getSkuId());
@@ -95,11 +106,16 @@ public class GoodsSkuService {
                     //容量不够了
                     throw new ServiceException("操作失败，库存不足");
                 }
-                goodsSku.setNum(buySkuRequest.getNum());
+                goodsSku.setNum(goodsSku.getNum()-buySkuRequest.getNum());
                 if (goodsSku.getNum() == 0) {
                     goodsSku.setStatus((byte) 1);
                 }
                 this.update(goodsSku);
+                BuyRecord buyRecord = new BuyRecord();
+                buyRecord.setBuyId(value);
+                buyRecord.setBuyUserId(UserContext.getCurrentUser().getId());
+                buyRecord.setNum(buySkuRequest.getNum());
+                buyRecord.setSkuId(buySkuRequest.getSkuId());
             } else {//超时
                 throw new ServiceException("太拥挤了，请稍后重试");
             }

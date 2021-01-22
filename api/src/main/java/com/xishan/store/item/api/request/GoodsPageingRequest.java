@@ -1,15 +1,12 @@
-package com.xishan.store.item.api.response;
+package com.xishan.store.item.api.request;
 
+import com.xishan.store.base.page.PageCommon;
 import lombok.Data;
 
-import java.io.Serializable;
-import java.util.List;
-
-/**
- * 用于redis缓存,聚合了商品以及sku的信息
- */
 @Data
-public class GoodDetailComplexDTO implements Serializable {
+public class GoodsPageingRequest extends PageCommon {
+
+
     private Integer id;
 
     private String goodsName;
@@ -41,9 +38,4 @@ public class GoodDetailComplexDTO implements Serializable {
     private String brandName;
 
     private String brandDesc;
-
-    private List<GoodsSkuDTO> goodsSkuList;
-
-
-
 }

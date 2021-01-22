@@ -12,4 +12,6 @@ public class BuySkuRequest implements Serializable {
     private Integer skuId;
 
     private Integer num;
+
+    private String uuid;//做幂等用
 }
