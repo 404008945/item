@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 @Slf4j
 @Order(2)
-public class LogAspect {
+public class ItemLogAspect {
 
     //申明一个切点 里面是 execution表达式
 

@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 @Slf4j
 @Order(3)
-public class UserContextAop {
+public class ItemUserContextAop {
 
     @Pointcut("execution(public * com.xishan.store.usercenter.userweb.controller.*.*(..))")
     private void userContextAspect() {
