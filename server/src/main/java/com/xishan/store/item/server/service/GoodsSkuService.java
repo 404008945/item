@@ -116,6 +116,7 @@ public class GoodsSkuService {
                 buyRecord.setBuyUserId(UserContext.getCurrentUser().getId());
                 buyRecord.setNum(buySkuRequest.getNum());
                 buyRecord.setSkuId(buySkuRequest.getSkuId());
+                buyRecordService.insert(buyRecord);
             } else {//超时
                 throw new ServiceException("太拥挤了，请稍后重试");
             }
