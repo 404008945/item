@@ -16,7 +16,7 @@ import org.springframework.util.StopWatch;
 //申明是个spring管理的bean
 @Component
 @Slf4j
-@Order(1)
+@Order(3)
 public class LogAspect {
 
     private Gson gson = new Gson();
@@ -27,7 +27,8 @@ public class LogAspect {
     private void controllerAspect() {
     }
 
-      @Around("controllerAspect()")
+    @Order(999)
+    @Around("controllerAspect()")
     public Object serviceLogAround(ProceedingJoinPoint point) throws Throwable {
         String className = point.getTarget().getClass().getName();
         String methodName = point.getSignature().getName();

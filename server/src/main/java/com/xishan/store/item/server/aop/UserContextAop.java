@@ -9,18 +9,21 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Aspect
 //申明是个spring管理的bean
 @Component
 @Slf4j
+@Order(1)
 public class UserContextAop {
 
     @Pointcut("execution(public * com.xishan.store.item.server.facade.*.*(..))")
     private void userContextAspect() {
     }
 
+    @Order(997)
     @Around("userContextAspect()")
     public Object serviceLogAround(ProceedingJoinPoint point) throws Throwable {
         //执行前，塞进UserContext中，执行后清除UserContext

@@ -1,6 +1,8 @@
 package com.xishan.store.item.server;
 
+import com.xishan.store.item.api.facade.GoodSkuWriteFacade;
 import com.xishan.store.item.api.model.Goods;
+import com.xishan.store.item.api.request.BuySkuRequest;
 import com.xishan.store.item.api.request.FindByGoodRequest;
 import com.xishan.store.item.api.response.GoodComplexDTO;
 import com.xishan.store.item.server.es.EsInit;
@@ -14,12 +16,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @SpringBootTest
 class ServerStarterApplicationTests {
 
     @Autowired
     private GoodsService goodsService;
+
+    @Autowired
+    private GoodSkuWriteFacade goodSkuWriteFacade;
 
 
     @Autowired
@@ -46,6 +52,16 @@ class ServerStarterApplicationTests {
         goods.setOriginal(12l);
         goods.setTags("111");
         goodsService.insert(goods);
+    }
+
+    @Test
+    void buy(){
+        BuySkuRequest buySkuRequest = new  BuySkuRequest();
+        buySkuRequest.setGoodId(1);
+        buySkuRequest.setNum(1);
+        buySkuRequest.setSkuId(1);
+        buySkuRequest.setUuid(UUID.randomUUID().toString());
+        goodSkuWriteFacade.buyGoods(buySkuRequest);
     }
 
 }

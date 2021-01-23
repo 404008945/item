@@ -1,12 +1,12 @@
 package com.xishan.store.item.server.service;
 
 import com.xishan.store.base.exception.ServiceException;
-import com.xishan.store.base.util.Response;
 import com.xishan.store.item.api.model.BuyRecord;
 import com.xishan.store.item.api.model.GoodsSku;
 import com.xishan.store.item.api.request.BuySkuRequest;
 import com.xishan.store.item.api.response.BuySkuResponse;
 import com.xishan.store.item.api.response.GoodsSkuDTO;
+import com.xishan.store.item.server.annotation.NeedRedisLock;
 import com.xishan.store.item.server.mapper.GoodsSkuMapper;
 import com.xishan.store.item.server.redis.RedisLock;
 import com.xishan.store.item.server.redis.RedisUtil;
@@ -20,7 +20,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -85,6 +84,7 @@ public class GoodsSkuService {
     /**
      * 购买商品为什么要加锁,如何做幂等
      */
+    @NeedRedisLock(value = "buySkuRequest.uuid",key = "buySkuRequest.skuId")
     public BuySkuResponse buyGoods(BuySkuRequest buySkuRequest){//锁的是sku，而不是good
         if (buySkuRequest == null) {
             throw new ServiceException("购买商品参数错误");

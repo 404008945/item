@@ -10,6 +10,7 @@ import com.xishan.store.item.server.service.GoodsSkuService;
 import com.xishan.store.item.server.util.BeanUtil;
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class GoodSkuWriteFacadeImpl implements GoodSkuWriteFacade {
@@ -48,6 +49,7 @@ public class GoodSkuWriteFacadeImpl implements GoodSkuWriteFacade {
         }
     }
 
+    @Transactional
     @Override
     public Response<BuySkuResponse> buyGoods(BuySkuRequest buySkuRequest) {
         try {
