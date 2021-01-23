@@ -170,7 +170,7 @@ public class GoodsService {
         List<GoodsSkuDTO> goodsSkuDTOS = goodsSkuService.listByGoodsId(goodsSku);
         goodDetailComplexDTO.setGoodsSkuList(goodsSkuDTOS);
         //放进redis
-        redisUtil.set(redisUtil.makeGoodRedisKey(goodDetailComplexDTO.getId()),goodDetailComplexDTO,expireTime*1000*60);
+        redisUtil.set(redisUtil.makeGoodRedisKey(goodDetailComplexDTO.getId()),goodDetailComplexDTO,expireTime);
         return goodDetailComplexDTO;
     }
 
