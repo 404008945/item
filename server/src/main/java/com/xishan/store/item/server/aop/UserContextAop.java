@@ -16,14 +16,14 @@ import org.springframework.stereotype.Component;
 //申明是个spring管理的bean
 @Component
 @Slf4j
-@Order(1)
+@Order(2)
 public class UserContextAop {
 
     @Pointcut("execution(public * com.xishan.store.item.server.facade.*.*(..))")
     private void userContextAspect() {
     }
 
-    @Order(997)
+    @Order(1)
     @Around("userContextAspect()")
     public Object serviceLogAround(ProceedingJoinPoint point) throws Throwable {
         //执行前，塞进UserContext中，执行后清除UserContext

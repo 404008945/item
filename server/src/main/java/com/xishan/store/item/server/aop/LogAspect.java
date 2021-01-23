@@ -16,11 +16,8 @@ import org.springframework.util.StopWatch;
 //申明是个spring管理的bean
 @Component
 @Slf4j
-@Order(3)
+@Order(1)
 public class LogAspect {
-
-    private Gson gson = new Gson();
-
     //申明一个切点 里面是 execution表达式
 
     @Pointcut("execution(public * com.xishan.store.item.server.facade.*.*(..))")

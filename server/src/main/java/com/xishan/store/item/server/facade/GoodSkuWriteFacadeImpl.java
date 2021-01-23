@@ -6,6 +6,7 @@ import com.xishan.store.item.api.model.GoodsSku;
 import com.xishan.store.item.api.request.BuySkuRequest;
 import com.xishan.store.item.api.request.GoodSkuUpdateRequest;
 import com.xishan.store.item.api.response.BuySkuResponse;
+import com.xishan.store.item.server.annotation.NeedRedisLock;
 import com.xishan.store.item.server.service.GoodsSkuService;
 import com.xishan.store.item.server.util.BeanUtil;
 import org.apache.dubbo.config.annotation.Service;
@@ -49,6 +50,7 @@ public class GoodSkuWriteFacadeImpl implements GoodSkuWriteFacade {
         }
     }
 
+    @NeedRedisLock(value = "buySkuRequest.uuid",key = "buySkuRequest.skuId")
     @Transactional
     @Override
     public Response<BuySkuResponse> buyGoods(BuySkuRequest buySkuRequest) {

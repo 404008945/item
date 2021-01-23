@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 //申明是个spring管理的bean
 @Component
 @Slf4j
-@Order(2)
+@Order(3)
 public class RedisLockAop {//在事务之后释放锁
     //15秒未抢到，则失败，需要重新抢
     @Value("${lockExpireTime:15000}")
@@ -44,7 +44,7 @@ public class RedisLockAop {//在事务之后释放锁
      * @return
      * @throws Throwable
      */
-    @Order(998)
+    @Order(3)
     @Around("redisLockAspect()")
     public Object redisLockAround(ProceedingJoinPoint point) throws Throwable {
         MethodSignature signature = (MethodSignature) point.getSignature();

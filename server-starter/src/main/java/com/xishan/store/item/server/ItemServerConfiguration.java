@@ -1,8 +1,10 @@
 package com.xishan.store.item.server;
 
 import com.github.pagehelper.PageHelper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.interceptor.BeanFactoryTransactionAttributeSourceAdvisor;
 
 import java.util.Properties;
 
@@ -20,5 +22,8 @@ public class ItemServerConfiguration {
         pageHelper.setProperties(properties);
         return pageHelper;
     }
-
+    @Autowired
+    public void setOrder(BeanFactoryTransactionAttributeSourceAdvisor beanFactoryTransactionAttributeSourceAdvisor){
+        beanFactoryTransactionAttributeSourceAdvisor.setOrder(4);
+    }
 }

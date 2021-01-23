@@ -84,7 +84,6 @@ public class GoodsSkuService {
     /**
      * 购买商品为什么要加锁,如何做幂等
      */
-    @NeedRedisLock(value = "buySkuRequest.uuid",key = "buySkuRequest.skuId")
     public BuySkuResponse buyGoods(BuySkuRequest buySkuRequest){//锁的是sku，而不是good
         if (buySkuRequest == null) {
             throw new ServiceException("购买商品参数错误");
@@ -92,42 +91,30 @@ public class GoodsSkuService {
         //value保证了，我这里加的锁只有本方法能解锁
         //做幂等，判断是否已经存在
         String value = buySkuRequest.getUuid();
-        try {
-            if (redisLock.tryLock(redisUtil.makeSkuRedisKey(buySkuRequest.getSkuId()), value, lockExpireTime)) {
-                BuyRecord record = buyRecordService.findByBuyId(value);
-                if (record != null) {
-                    throw new ServiceException("不可重复购买");
-                }
-                //进行判断与扣除操作
-                GoodsSku req = new GoodsSku();
-                req.setId(buySkuRequest.getSkuId());
-                GoodsSku goodsSku = this.findById(req);
-                if (goodsSku.getNum() < buySkuRequest.getNum()) {
-                    //容量不够了
-                    throw new ServiceException("操作失败，库存不足");
-                }
-                goodsSku.setNum(goodsSku.getNum()-buySkuRequest.getNum());
-                if (goodsSku.getNum() == 0) {
-                    goodsSku.setStatus((byte) 1);
-                }
-                this.update(goodsSku);
-                BuyRecord buyRecord = new BuyRecord();
-                buyRecord.setBuyId(value);
-                buyRecord.setBuyUserId(UserContext.getCurrentUser().getId());
-                buyRecord.setNum(buySkuRequest.getNum());
-                buyRecord.setSkuId(buySkuRequest.getSkuId());
-                buyRecordService.insert(buyRecord);
-            } else {//超时
-                throw new ServiceException("太拥挤了，请稍后重试");
-            }
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            throw new ServiceException("购买失败");
-        } finally {
-            if (!redisLock.unlock(redisUtil.makeSkuRedisKey(buySkuRequest.getSkuId()), value)) {
-                throw new ServiceException("锁释放失败" + redisUtil.makeSkuRedisKey(buySkuRequest.getSkuId()));
-            }
+
+        BuyRecord record = buyRecordService.findByBuyId(value);
+        if (record != null) {
+            throw new ServiceException("不可重复购买");
         }
+        //进行判断与扣除操作
+        GoodsSku req = new GoodsSku();
+        req.setId(buySkuRequest.getSkuId());
+        GoodsSku goodsSku = this.findById(req);
+        if (goodsSku.getNum() < buySkuRequest.getNum()) {
+            //容量不够了
+            throw new ServiceException("操作失败，库存不足");
+        }
+        goodsSku.setNum(goodsSku.getNum() - buySkuRequest.getNum());
+        if (goodsSku.getNum() == 0) {
+            goodsSku.setStatus((byte) 1);
+        }
+        this.update(goodsSku);
+        BuyRecord buyRecord = new BuyRecord();
+        buyRecord.setBuyId(value);
+        buyRecord.setBuyUserId(UserContext.getCurrentUser().getId());
+        buyRecord.setNum(buySkuRequest.getNum());
+        buyRecord.setSkuId(buySkuRequest.getSkuId());
+        buyRecordService.insert(buyRecord);
         BuySkuResponse response = BeanUtil.convertToBean(buySkuRequest, BuySkuResponse.class);
         return response;
     }
