@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.interceptor.BeanFactoryTransactionAttributeSourceAdvisor;
+import org.springframework.transaction.interceptor.TransactionAttributeSource;
 
 import java.util.Properties;
 
@@ -24,8 +25,10 @@ public class ItemServerConfiguration {
         return pageHelper;
     }
     @Autowired
-    public void setOrder(BeanFactoryTransactionAttributeSourceAdvisor beanFactoryTransactionAttributeSourceAdvisor){
+    public void setOrder(BeanFactoryTransactionAttributeSourceAdvisor beanFactoryTransactionAttributeSourceAdvisor, TransactionAttributeSource transactionAttributeSource){
         beanFactoryTransactionAttributeSourceAdvisor.setOrder(4);
-    //    beanFactoryTransactionAttributeSourceAdvisor.setAdvice(new TransactionAdivisor());
+        TransactionAdivisor transactionAdivisor = new TransactionAdivisor();
+        transactionAdivisor.setTransactionAttributeSource(transactionAttributeSource);
+        beanFactoryTransactionAttributeSourceAdvisor.setAdvice(transactionAdivisor);
     }
 }

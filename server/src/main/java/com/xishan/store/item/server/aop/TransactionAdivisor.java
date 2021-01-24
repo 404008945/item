@@ -24,6 +24,7 @@ public class TransactionAdivisor extends TransactionInterceptor {
     @Override
     protected void commitTransactionAfterReturning(TransactionInfo txInfo) {
         commitAfter(txInfo);
+        super.completeTransactionAfterThrowing(txInfo,new RuntimeException());
     }
 
     @Override
