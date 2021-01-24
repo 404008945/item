@@ -11,4 +11,6 @@ public class BuySkuResponse implements Serializable {
     private Integer skuId;
 
     private Integer num;
+
+    private Long amount;//购买所需余额
 }

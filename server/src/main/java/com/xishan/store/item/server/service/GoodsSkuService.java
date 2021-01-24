@@ -116,6 +116,7 @@ public class GoodsSkuService {
         buyRecord.setSkuId(buySkuRequest.getSkuId());
         buyRecordService.insert(buyRecord);
         BuySkuResponse response = BeanUtil.convertToBean(buySkuRequest, BuySkuResponse.class);
+        response.setAmount(goodsSku.getPrice()*buySkuRequest.getNum());
         return response;
     }
 
