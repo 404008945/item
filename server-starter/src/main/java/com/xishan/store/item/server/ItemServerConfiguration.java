@@ -1,6 +1,7 @@
 package com.xishan.store.item.server;
 
 import com.github.pagehelper.PageHelper;
+import com.xishan.store.item.server.aop.TransactionAdivisor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,5 +26,6 @@ public class ItemServerConfiguration {
     @Autowired
     public void setOrder(BeanFactoryTransactionAttributeSourceAdvisor beanFactoryTransactionAttributeSourceAdvisor){
         beanFactoryTransactionAttributeSourceAdvisor.setOrder(4);
+    //    beanFactoryTransactionAttributeSourceAdvisor.setAdvice(new TransactionAdivisor());
     }
 }

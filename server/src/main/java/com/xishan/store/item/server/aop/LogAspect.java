@@ -12,7 +12,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
-@Aspect
+//@Aspect
 //申明是个spring管理的bean
 @Component
 @Slf4j

@@ -111,7 +111,7 @@ public class GoodsSkuService {
         this.update(goodsSku);
         BuyRecord buyRecord = new BuyRecord();
         buyRecord.setBuyId(value);
-        buyRecord.setBuyUserId(UserContext.getCurrentUser().getId());
+        buyRecord.setBuyUserId(1l);
         buyRecord.setNum(buySkuRequest.getNum());
         buyRecord.setSkuId(buySkuRequest.getSkuId());
         buyRecordService.insert(buyRecord);
