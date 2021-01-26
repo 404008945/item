@@ -12,11 +12,14 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import static java.lang.Thread.sleep;
 
 @SpringBootTest
 class ServerStarterApplicationTests {
@@ -26,6 +29,8 @@ class ServerStarterApplicationTests {
 
     @Autowired
     private GoodSkuWriteFacade goodSkuWriteFacade;
+
+
 
 
     @Autowired
@@ -62,6 +67,14 @@ class ServerStarterApplicationTests {
         buySkuRequest.setSkuId(1);
         buySkuRequest.setUuid(UUID.randomUUID().toString());
         goodSkuWriteFacade.buyGoods(buySkuRequest);
+        while (true){
+            try {
+                sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
 }

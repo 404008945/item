@@ -12,7 +12,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-//@Aspect
+@Aspect
 //申明是个spring管理的bean
 @Component
 @Slf4j

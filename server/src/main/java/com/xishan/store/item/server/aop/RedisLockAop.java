@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
 
 @Aspect
 //申明是个spring管理的bean
-//@Component
+@Component
 @Slf4j
 @Order(3)
 public class RedisLockAop {//在事务之后释放锁
