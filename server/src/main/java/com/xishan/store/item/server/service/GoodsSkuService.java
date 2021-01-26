@@ -1,5 +1,6 @@
 package com.xishan.store.item.server.service;
 
+import com.alibaba.fastjson.JSON;
 import com.xishan.store.base.exception.ServiceException;
 import com.xishan.store.item.api.model.BuyRecord;
 import com.xishan.store.item.api.model.GoodsSku;
@@ -8,6 +9,8 @@ import com.xishan.store.item.api.response.BuySkuResponse;
 import com.xishan.store.item.api.response.GoodsSkuDTO;
 import com.xishan.store.item.server.annotation.NeedRedisLock;
 import com.xishan.store.item.server.mapper.GoodsSkuMapper;
+import com.xishan.store.item.server.mq.MqService;
+import com.xishan.store.item.server.mq.message.GoodSkuNaneUpdateMessage;
 import com.xishan.store.item.server.redis.RedisLock;
 import com.xishan.store.item.server.redis.RedisUtil;
 import com.xishan.store.item.server.util.BeanUtil;
@@ -42,6 +45,15 @@ public class GoodsSkuService {
     @Autowired
     private BuyRecordService buyRecordService;
 
+    @Autowired
+    private MqService mqService;
+
+    @Value("rocketmq.topic:updateName")
+    private String topic;
+
+    @Value("rocketmq.tag:skuName")
+    private String tag;
+
 
     public GoodsSku findById(GoodsSku goodsSku){
         return goodsSkuMapper.selectByPrimaryKey(goodsSku.getId());
@@ -52,9 +64,20 @@ public class GoodsSkuService {
     }
 
     public Integer update(GoodsSku goodsSku){//需要将缓存失效
-
+        GoodsSku sku = goodsSkuMapper.selectByPrimaryKey(goodsSku.getId());
+        boolean flag = false;
+        if(!sku.getTitle().equals(goodsSku.getTitle())){
+            flag = true;
+        }
         int n = goodsSkuMapper.updateByPrimaryKeySelective(goodsSku);
         if(n > 0){
+            if(flag) {
+                GoodSkuNaneUpdateMessage goodSkuNaneUpdateMessage = new GoodSkuNaneUpdateMessage();
+                goodSkuNaneUpdateMessage.setId(goodsSku.getId());
+                goodSkuNaneUpdateMessage.setSkuName(goodsSku.getTitle());
+                mqService.send(topic,tag, JSON.toJSONString(goodSkuNaneUpdateMessage));
+            }
+
             redisUtil.del(redisUtil.makeGoodRedisKey(goodsSku.getGoodsId()));
             return  n;
         }
@@ -91,15 +114,20 @@ public class GoodsSkuService {
         //value保证了，我这里加的锁只有本方法能解锁
         //做幂等，判断是否已经存在
         String value = buySkuRequest.getUuid();
-
-        BuyRecord record = buyRecordService.findByBuyId(value);
-        if (record != null) {
-            throw new ServiceException("不可重复购买");
-        }
         //进行判断与扣除操作
         GoodsSku req = new GoodsSku();
         req.setId(buySkuRequest.getSkuId());
         GoodsSku goodsSku = this.findById(req);
+        BuyRecord record = buyRecordService.findByBuyId(value);
+        if (record != null) {
+            BuySkuResponse buySkuResponse = new BuySkuResponse();
+            buySkuResponse.setAmount(goodsSku.getPrice()*record.getNum());
+            buySkuResponse.setGoodId(buySkuRequest.getGoodId());
+            buySkuResponse.setNum(record.getNum());
+            buySkuResponse.setSkuId(buySkuRequest.getSkuId());
+            return buySkuResponse;
+        }
+
         if (goodsSku.getNum() < buySkuRequest.getNum()) {
             //容量不够了
             throw new ServiceException("操作失败，库存不足");

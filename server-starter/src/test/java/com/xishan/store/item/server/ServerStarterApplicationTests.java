@@ -1,5 +1,6 @@
 package com.xishan.store.item.server;
 
+import com.alibaba.fastjson.JSON;
 import com.xishan.store.item.api.facade.GoodSkuWriteFacade;
 import com.xishan.store.item.api.model.Goods;
 import com.xishan.store.item.api.request.BuySkuRequest;
@@ -7,6 +8,8 @@ import com.xishan.store.item.api.request.FindByGoodRequest;
 import com.xishan.store.item.api.response.GoodComplexDTO;
 import com.xishan.store.item.server.es.EsInit;
 import com.xishan.store.item.server.es.client.GoodEsClient;
+import com.xishan.store.item.server.mq.MqService;
+import com.xishan.store.item.server.mq.message.GoodSkuNaneUpdateMessage;
 import com.xishan.store.item.server.service.GoodsService;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.Test;
@@ -31,6 +34,8 @@ class ServerStarterApplicationTests {
     private GoodSkuWriteFacade goodSkuWriteFacade;
 
 
+    @Autowired
+    private MqService mqService;
 
 
     @Autowired
@@ -38,9 +43,10 @@ class ServerStarterApplicationTests {
     @Test
     void contextLoads() {
 
-        GoodComplexDTO complexDTO = new GoodComplexDTO();
-        complexDTO.setGoodsName("玉米");
-        System.out.println( client.paging(complexDTO,1,10));
+        GoodSkuNaneUpdateMessage goodSkuNaneUpdateMessage = new GoodSkuNaneUpdateMessage();
+        goodSkuNaneUpdateMessage.setId(1);
+        goodSkuNaneUpdateMessage.setSkuName("23213");
+        mqService.send("updateName","skuName", JSON.toJSONString(goodSkuNaneUpdateMessage));
 
     }
 

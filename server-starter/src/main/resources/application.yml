@@ -57,3 +57,10 @@ logging:
     timeout: 5000
 elasticsearch:
   ip: 47.93.9.181:9200
+
+rocketmq:
+  group: "defaultGroup"
+  nameServerAddr: "47.93.9.181:2181"
+  topic: "updateName"
+  goodTag: "goodTag"
+  skuTag: "skuTag"

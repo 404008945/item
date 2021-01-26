@@ -99,6 +99,10 @@
             <groupId>com.xishan.store.usercenter</groupId>
             <artifactId>user-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-client</artifactId>
+        </dependency>
 
     </dependencies>
 
