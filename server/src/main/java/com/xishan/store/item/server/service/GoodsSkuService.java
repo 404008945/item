@@ -51,7 +51,7 @@ public class GoodsSkuService {
     @Value("${rocketmq.topic:updateName}")
     private String topic;
 
-    @Value("${rocketmq.tag:skuName}")
+    @Value("${rocketmq.skutag:skuName}")
     private String tag;
 
 
@@ -64,22 +64,15 @@ public class GoodsSkuService {
     }
 
     public Integer update(GoodsSku goodsSku){//需要将缓存失效
-        GoodsSku sku = goodsSkuMapper.selectByPrimaryKey(goodsSku.getId());
-        boolean flag = false;
-        if(!sku.getTitle().equals(goodsSku.getTitle())){
-            flag = true;
-        }
+
         int n = goodsSkuMapper.updateByPrimaryKeySelective(goodsSku);
         if(n > 0){
-            if(flag) {
-                GoodSkuNaneUpdateMessage goodSkuNaneUpdateMessage = new GoodSkuNaneUpdateMessage();
-                goodSkuNaneUpdateMessage.setId(goodsSku.getId());
-                goodSkuNaneUpdateMessage.setSkuName(goodsSku.getTitle());
-                mqService.send(topic,tag, JSON.toJSONString(goodSkuNaneUpdateMessage));
-            }
-
+            GoodSkuNaneUpdateMessage goodSkuNaneUpdateMessage = new GoodSkuNaneUpdateMessage();
+            goodSkuNaneUpdateMessage.setId(goodsSku.getId());
+            goodSkuNaneUpdateMessage.setSkuName(goodsSku.getTitle());
+            mqService.send(topic, tag, JSON.toJSONString(goodSkuNaneUpdateMessage));
             redisUtil.del(redisUtil.makeGoodRedisKey(goodsSku.getGoodsId()));
-            return  n;
+            return n;
         }
        throw new ServiceException("更新失败");
     }

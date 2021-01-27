@@ -1,5 +1,6 @@
 package com.xishan.store.item.server.service;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.xishan.store.base.exception.ServiceException;
@@ -18,6 +19,9 @@ import com.xishan.store.item.server.es.client.GoodEsClient;
 import com.xishan.store.item.server.mapper.BrandMapper;
 import com.xishan.store.item.server.mapper.CategoriesMapper;
 import com.xishan.store.item.server.mapper.GoodsMapper;
+import com.xishan.store.item.server.mq.MqService;
+import com.xishan.store.item.server.mq.message.GoodNameUpdateMessage;
+import com.xishan.store.item.server.mq.message.GoodSkuNaneUpdateMessage;
 import com.xishan.store.item.server.redis.RedisUtil;
 import com.xishan.store.item.server.util.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +61,15 @@ public class GoodsService {
     @Value("${expireTime:30}")
     private Integer expireTime;
 
+
+    @Value("${rocketmq.topic:updateName}")
+    private String topic;
+
+    @Value("${rocketmq.goodtag:goodName}")
+    private String tag;
+
+    @Autowired
+    private MqService mqService;
     /**
      * 查询good并关联类目和品牌
      * @param findByGoodRequest
@@ -132,6 +145,10 @@ public class GoodsService {
         if (n >= 0) {
             GoodComplexDTO goodComplexDTO =this.toGoodComplex(goods,null,null);
             goodEsClient.index(goodComplexDTO);
+            GoodNameUpdateMessage goodNameUpdateMessage = new GoodNameUpdateMessage();
+            goodNameUpdateMessage.setId(goods.getId());
+            goodNameUpdateMessage.setGoodName(goods.getGoodsName());
+            mqService.send(topic, tag, JSON.toJSONString(goodNameUpdateMessage));
             redisUtil.del(redisUtil.makeGoodRedisKey(goodComplexDTO.getId()));
         }
         return n;
