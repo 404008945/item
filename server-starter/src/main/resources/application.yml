@@ -60,7 +60,7 @@ elasticsearch:
 
 rocketmq:
   group: "defaultGroup"
-  nameServerAddr: "47.93.9.181:2181"
+  nameServerAddr: "47.93.9.181:9876"
   topic: "updateName"
   goodTag: "goodTag"
   skuTag: "skuTag"

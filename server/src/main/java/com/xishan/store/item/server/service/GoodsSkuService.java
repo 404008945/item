@@ -48,10 +48,10 @@ public class GoodsSkuService {
     @Autowired
     private MqService mqService;
 
-    @Value("rocketmq.topic:updateName")
+    @Value("${rocketmq.topic:updateName}")
     private String topic;
 
-    @Value("rocketmq.tag:skuName")
+    @Value("${rocketmq.tag:skuName}")
     private String tag;
 
 

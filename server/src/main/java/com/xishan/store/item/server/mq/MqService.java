@@ -11,12 +11,12 @@ import javax.annotation.PreDestroy;
 @Service
 public class MqService {
 
-    @Value("rocketmq.group:defaultGroup")
+    @Value("${rocketmq.group:defaultGroup}")
     private String group;
-    @Value("rocketmq.nameServerAddr:47.93.9.181:9876")
+    @Value("${rocketmq.nameServerAddr:47.93.9.181:9876}")
     private String nameServer;
 
-    @Value("rocketmq.topic:updateName")
+    @Value("${rocketmq.topic:updateName}")
     private String tag;
 
     private DefaultMQProducer producer = null;
