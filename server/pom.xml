@@ -103,7 +103,10 @@
             <groupId>org.apache.rocketmq</groupId>
             <artifactId>rocketmq-client</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.xishan.store.trade</groupId>
+            <artifactId>api</artifactId>
+        </dependency>
     </dependencies>
 
 

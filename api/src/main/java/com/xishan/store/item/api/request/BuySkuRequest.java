@@ -14,4 +14,15 @@ public class BuySkuRequest implements Serializable {
     private Integer num;
 
     private String uuid;//做幂等用
+
+    private Integer goodsId;
+
+    private Byte payType;
+    private Byte type;
+    private String code;
+
+    private Long userId;
+
+    private String userName;
+
 }
